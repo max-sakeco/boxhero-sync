@@ -101,6 +101,7 @@ def get_attr_value(attrs, name):
 
 @app.route('/')
 def index():
+    logger.info("Starting index page request")
     session = get_session()
     items_query = session.query(Item).all()
     
@@ -147,6 +148,10 @@ def index():
     )
 
 if __name__ == '__main__':
+    # Initialize database
+    from models import init_db
+    init_db()
+    
     # Get port from environment variable for Replit
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
