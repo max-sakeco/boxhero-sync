@@ -59,9 +59,9 @@ HTML_TEMPLATE = """
                     <tr {% if item.quantity == 0 %}class="zero-stock"{% endif %}>
                         <td>{{ item.name }}</td>
                         <td>{{ item.sku }}</td>
-                        <td {% if item.quantity < item.min_stock %}class="low-stock"{% endif %}>
+                        <td {% if item.min_stock is not none and item.quantity < item.min_stock %}class="low-stock"{% endif %}>
                             {{ item.quantity }}
-                            {% if item.min_stock and item.quantity < item.min_stock %}
+                            {% if item.min_stock is not none and item.quantity < item.min_stock %}
                             <span class="badge bg-warning">Low Stock</span>
                             {% endif %}
                         </td>
