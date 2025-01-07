@@ -1,3 +1,4 @@
+
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, create_engine, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -34,11 +35,23 @@ class SyncLog(Base):
     error_message = Column(String)
 
 def init_db():
-    engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=10)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=5,
+        max_overflow=10,
+        pool_timeout=30,
+        pool_pre_ping=True
+    )
     Base.metadata.create_all(engine)
     return engine
 
 def get_session():
-    engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=10)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_size=5,
+        max_overflow=10,
+        pool_timeout=30,
+        pool_pre_ping=True
+    )
     Session = sessionmaker(bind=engine)
     return Session()
