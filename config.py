@@ -12,7 +12,7 @@ BOXHERO_API_KEY = os.getenv("BOXHERO_API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost:5432/boxhero").replace("postgres://", "postgresql://")
 
 # Sync Configuration
-SYNC_INTERVAL_MINUTES = int(os.getenv("SYNC_INTERVAL_MINUTES", "60"))
+SYNC_INTERVAL_MINUTES = int(os.getenv("SYNC_INTERVAL_MINUTES", "1440"))  # 24 hours = 1440 minutes
 BATCH_SIZE = 100  # Number of records to process in each batch
 
 # Retry Configuration
