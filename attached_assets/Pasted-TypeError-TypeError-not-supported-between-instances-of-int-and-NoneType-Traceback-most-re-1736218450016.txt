@@ -1,0 +1,38 @@
+TypeError
+TypeError: '<' not supported between instances of 'int' and 'NoneType'
+
+Traceback (most recent call last)
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 1478, in __call__
+return self.wsgi_app(environ, start_response)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 1458, in wsgi_app
+response = self.handle_exception(e)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 1455, in wsgi_app
+response = self.full_dispatch_request()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 869, in full_dispatch_request
+rv = self.handle_user_exception(e)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 867, in full_dispatch_request
+rv = self.dispatch_request()
+     ^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/app.py", line 852, in dispatch_request
+return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/web_app.py", line 142, in index
+return render_template_string(
+       
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/templating.py", line 164, in render_template_string
+return _render(app, template, context)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/flask/templating.py", line 133, in _render
+rv = template.render(context)
+     ^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/jinja2/environment.py", line 1295, in render
+self.environment.handle_exception()
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/home/runner/boxhero-sync/.pythonlibs/lib/python3.12/site-packages/jinja2/environment.py", line 942, in handle_exception
+raise rewrite_traceback_stack(source=source)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "<template>", line 54, in top-level template code
