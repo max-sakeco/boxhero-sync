@@ -123,7 +123,7 @@ def index():
         # Extract attributes
         attrs = item.attrs or []
         min_stock = get_attr_value(attrs, 'Minimum Stock')
-        min_stock = int(min_stock) if min_stock and min_stock.isdigit() else None
+        min_stock = int(min_stock) if min_stock and str(min_stock).isdigit() else None
         
         items.append({
             'name': item.name,
