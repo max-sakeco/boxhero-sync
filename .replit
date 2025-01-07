@@ -1,11 +1,11 @@
-run = "python web_app.py"
+run = "python main.py"
 language = "python3"
-entrypoint = "web_app.py"
 hidden = [".config", "**/__pycache__", "**/.mypy_cache", "**/*.pyc"]
+modules = ["python-3.12", "nix"]
 
 [nix]
-channel = "stable-23_05"
+channel = "stable-24_05"
 
 [deployment]
-run = ["sh", "-c", "python web_app.py"]
+run = ["sh", "-c", "python main.py"]
 deploymentTarget = "cloudrun"
