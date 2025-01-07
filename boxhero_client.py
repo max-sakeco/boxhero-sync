@@ -9,7 +9,7 @@ class BoxHeroClient:
     def __init__(self):
         self.base_url = BOXHERO_API_BASE_URL
         self.headers = {
-            "Authorization": BOXHERO_API_KEY,
+            "Authorization": f"Bearer {BOXHERO_API_KEY}",
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
