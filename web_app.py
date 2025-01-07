@@ -23,7 +23,13 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container-fluid mt-4">
-        <h1>BoxHero Inventory</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>BoxHero Inventory</h1>
+            <button id="sync-button" class="btn btn-primary">
+                <span id="sync-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                Sync Now
+            </button>
+        </div>
         <div class="row mb-3">
             <div class="col">
                 <div class="card">
@@ -78,7 +84,33 @@ HTML_TEMPLATE = """
         </div>
     </div>
     <script>
+        function syncInventory() {
+            const button = $('#sync-button');
+            const spinner = $('#sync-spinner');
+            
+            button.prop('disabled', true);
+            spinner.removeClass('d-none');
+            
+            fetch('/sync', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert('Sync failed: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Sync failed: ' + error);
+                })
+                .finally(() => {
+                    button.prop('disabled', false);
+                    spinner.addClass('d-none');
+                });
+        }
+        
         $(document).ready(function() {
+            $('#sync-button').click(syncInventory);
             $('#inventory-table').DataTable({
                 pageLength: 25,
                 order: [[0, 'asc']],
@@ -99,6 +131,17 @@ def get_attr_value(attrs, name):
         if attr.get('name') == name:
             return attr.get('value', '')
     return ""
+
+@app.route('/sync', methods=['POST'])
+def trigger_sync():
+    try:
+        from sync_service import SyncService
+        service = SyncService()
+        service.sync()
+        return {"status": "success", "message": "Sync completed successfully"}
+    except Exception as e:
+        logger.error(f"Manual sync failed: {str(e)}")
+        return {"status": "error", "message": str(e)}, 500
 
 @app.route('/')
 def index():
