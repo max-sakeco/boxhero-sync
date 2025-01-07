@@ -1,7 +1,7 @@
 run = "python main.py"
 language = "python3"
 hidden = [".config", "**/__pycache__", "**/.mypy_cache", "**/*.pyc"]
-modules = ["python-3.12", "nix"]
+modules = ["python-3.12", "nix", "postgresql-16"]
 
 [nix]
 channel = "stable-24_05"
