@@ -9,7 +9,7 @@ BOXHERO_API_BASE_URL = "https://rest.boxhero-app.com/v1"
 BOXHERO_API_KEY = os.getenv("BOXHERO_API_KEY")
 
 # Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///boxhero.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost:5432/boxhero").replace("postgres://", "postgresql://")
 
 # Sync Configuration
 SYNC_INTERVAL_MINUTES = int(os.getenv("SYNC_INTERVAL_MINUTES", "60"))

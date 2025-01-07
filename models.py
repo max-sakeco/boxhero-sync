@@ -34,11 +34,11 @@ class SyncLog(Base):
     error_message = Column(String)
 
 def init_db():
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=10)
     Base.metadata.create_all(engine)
     return engine
 
 def get_session():
-    engine = create_engine(DATABASE_URL)
+    engine = create_engine(DATABASE_URL, pool_size=5, max_overflow=10)
     Session = sessionmaker(bind=engine)
     return Session()
