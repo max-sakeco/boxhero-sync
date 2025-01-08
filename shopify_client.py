@@ -108,7 +108,7 @@ class ShopifyClient:
                         displayFinancialStatus
                         channelInformation {
                             channelDefinition {
-                                type
+                                handle
                             }
                         }
                         lineItems(first: 50) {
@@ -146,7 +146,7 @@ class ShopifyClient:
                     'order_name': order['name'],
                     'created_at': order['createdAt'],
                     'total_price': str(order.get('totalPrice', '0.00')),
-                    'sales_channel': order.get('channelInformation', {}).get('channelDefinition', {}).get('type'),
+                    'sales_channel': order.get('channelInformation', {}).get('channelDefinition', {}).get('handle'),
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
