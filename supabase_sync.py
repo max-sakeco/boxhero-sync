@@ -1,8 +1,7 @@
-
 from supabase_service import SupabaseService
 from models import get_session, Product, ShopifySale, ShopifySaleItem, SyncLog
 from loguru import logger
-from datetime import datetime
+from datetime import datetime, timezone as datetime_timezone
 
 class SupabaseSync:
     def __init__(self):
@@ -38,12 +37,12 @@ class SupabaseSync:
                 'created_at': sale.created_at.isoformat() if sale.created_at else None,
                 'total_price': float(sale.total_price) if sale.total_price else None,
                 'sales_channel': sale.sales_channel,
-                'synced_at': datetime.utcnow().isoformat()
+                'synced_at': datetime.now(datetime_timezone.utc).isoformat()
             }, on_conflict='shopify_order_id').execute()
 
             # Get the Supabase sale ID from the response
             supabase_sale = sale_result.data[0]
-            
+
             # Sync sale items
             for item in sale.items:
                 self.supabase.client.table('shopify_sale_items').upsert({
@@ -53,9 +52,9 @@ class SupabaseSync:
                     'original_price': float(item.original_price) if item.original_price else None,
                     'discounted_price': float(item.discounted_price) if item.discounted_price else None,
                     'sku': item.sku,
-                    'synced_at': datetime.utcnow().isoformat()
+                    'synced_at': datetime.now(datetime_timezone.utc).isoformat()
                 }).execute()
-        
+
         logger.info(f"Synced {len(sales)} sales to Supabase")
 
     def sync_all(self):
