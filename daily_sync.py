@@ -5,11 +5,7 @@ from loguru import logger
 def run_daily_sync():
     service = SyncService()
     try:
-        # Full product sync
-        logger.info("Starting product sync")
-        service.sync_products()
-        
-        # Sync only last day's sales
+        # Skip product sync for testing
         logger.info("Starting sales sync")
         service.sync_recent_sales(days=1)
         
