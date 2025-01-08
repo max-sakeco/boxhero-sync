@@ -25,7 +25,7 @@ class SupabaseSync:
                 'last_synced_at': product.last_synced_at.isoformat() if product.last_synced_at else None,
                 'created_at': product.created_at.isoformat() if product.created_at else None,
                 'updated_at': product.updated_at.isoformat() if product.updated_at else None
-            }).execute()
+            }, on_conflict='shopify_id').execute()
         logger.info(f"Synced {len(products)} products to Supabase")
 
     def sync_sales(self):
