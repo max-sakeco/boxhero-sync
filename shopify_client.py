@@ -93,7 +93,7 @@ class ShopifyClient:
     def iter_recent_orders(self, days: int = 30) -> Generator[Dict, None, None]:
         query = """
         query($cursor: String) {
-            orders(first: 50, after: $cursor) {
+            orders(first: 50, after: $cursor, query: "created_at:>=2025-01-01") {
                 pageInfo {
                     hasNextPage
                     endCursor

@@ -64,7 +64,10 @@ class SyncService:
         sync_log = self._create_sync_log()
         try:
             logger.info(f"Starting sales sync for past {days} days")
+            orders_count = 0
             for order_data in self.client.iter_recent_orders(days=days):
+                orders_count += 1
+                logger.info(f"Found order {orders_count}: {order_data['order_name']}")
                 logger.info(f"Processing order: {order_data['order_name']}")
                 # Skip if order already exists
                 if self.session.query(Sale).filter_by(shopify_order_id=order_data['id']).first():
