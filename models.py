@@ -34,6 +34,7 @@ class ShopifySale(Base):
     total_price = Column(Numeric(10, 2))
     sales_channel = Column(String)
     synced_at = Column(DateTime, default=datetime.utcnow)
+    items = relationship("ShopifySaleItem", backref="sale")
 
 class ShopifySaleItem(Base):
     __tablename__ = 'shopify_sale_items'
