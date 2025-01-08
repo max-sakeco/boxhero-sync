@@ -43,8 +43,8 @@ class SyncService:
                 product.inventory_quantity = product_data.get('quantity', 0)
                 price = product_data.get('price')
                 cost = product_data.get('cost')
-                product.price = Decimal(str(price)) if price is not None else Decimal('0')
-                product.compare_at_price = Decimal(str(cost)) if cost is not None else Decimal('0')
+                product.price = safe_decimal(price)
+                product.compare_at_price = safe_decimal(cost)
                 product.image_url = product_data.get('photo_url')
                 product.last_synced_at = datetime.utcnow()
 
@@ -71,15 +71,12 @@ class SyncService:
                 from utils import safe_decimal
                 
                 # Clean and convert price string
-                total_price = order_data['total_price']
-                if not total_price:
-                    total_price = '0.00'
-                
+                from utils import safe_decimal
                 sale = Sale(
                     shopify_order_id=order_data['id'],
                     order_name=order_data['order_name'],
                     created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                    total_price=Decimal(total_price)
+                    total_price=safe_decimal(order_data['total_price'])
                 )
                 self.session.add(sale)
                 self.session.flush()  # Get sale.id
