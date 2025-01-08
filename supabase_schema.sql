@@ -35,6 +35,18 @@ CREATE TABLE IF NOT EXISTS shopify_sale_items (
     synced_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Add synced_at column if it doesn't exist
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'shopify_sale_items' 
+        AND column_name = 'synced_at'
+    ) THEN
+        ALTER TABLE shopify_sale_items ADD COLUMN synced_at TIMESTAMPTZ DEFAULT NOW();
+    END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS sync_logs (
     id SERIAL PRIMARY KEY,
     start_time TIMESTAMPTZ NOT NULL,
