@@ -11,6 +11,14 @@ class SupabaseService:
             raise ValueError("Supabase credentials not found in environment")
         self.client = create_client(supabase_url, supabase_key)
 
+    def delete_all_items(self):
+        try:
+            self.client.table('boxhero').delete().neq('boxhero_id', '').execute()
+            logger.info("Deleted all items from Supabase")
+        except Exception as e:
+            logger.error(f"Error deleting items from Supabase: {str(e)}")
+            raise
+
     def _get_attr_value(self, attrs, name):
         if not attrs:
             return None
