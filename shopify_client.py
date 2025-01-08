@@ -146,7 +146,7 @@ class ShopifyClient:
                     'order_name': order['name'],
                     'created_at': order['createdAt'],
                     'total_price': str(order.get('totalPrice', '0.00')),
-                    'sales_channel': order.get('channelInformation', {}).get('channelDefinition', {}).get('handle'),
+                    'sales_channel': order['channelInformation']['channelDefinition']['handle'] if order.get('channelInformation') and order['channelInformation'].get('channelDefinition') else None,
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
