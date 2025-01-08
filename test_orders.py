@@ -1,9 +1,11 @@
+
 from shopify_client import ShopifyClient
 from loguru import logger
 
 def test_orders():
     try:
         client = ShopifyClient()
+        logger.info("Testing Shopify Orders API...")
         logger.info("Fetching orders from Shopify...")
         count = 0
         for order in client.iter_recent_orders(days=30):
@@ -14,11 +16,12 @@ def test_orders():
             logger.info(f"Created At: {order['created_at']}")
             logger.info(f"Total Price: {order['total_price']}")
             logger.info(f"Sales Channel: {order.get('sales_channel', 'N/A')}")
+            logger.info("-" * 50)
             logger.info("Items:")
             for item in order['items']:
                 logger.info(f"- {item['title']} (x{item['quantity']}) @ {item['original_price']}")
 
-            if count >= 5:  # Limit to first 5 orders for testing
+            if count >= 3:  # Limit to first 3 orders for testing
                 break
 
         if count == 0:
