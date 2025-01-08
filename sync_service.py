@@ -111,10 +111,6 @@ class SyncService:
                     
                     sync_log.records_processed = (sync_log.records_processed or 0) + 1
                     self.session.commit()
-                except Exception as e:
-                    self.session.rollback()
-                    logger.error(f"Error processing sale {order_data['order_name']}: {str(e)}")
-                    raise
                 
             if orders_count == 0:
                 logger.warning("No orders found to sync")
