@@ -101,11 +101,14 @@ class SyncService:
                     self.session.add(sale_item)
                 
                 sync_log.records_processed = (sync_log.records_processed or 0) + 1
+                self.session.commit()  # Commit after each order
                 
-            self.session.commit()
+            if orders_count == 0:
+                logger.warning("No orders found to sync")
             self._update_sync_log(sync_log, "completed")
             
         except Exception as e:
+            logger.error(f"Error syncing sales: {str(e)}")
             self.session.rollback()
             self._update_sync_log(sync_log, "failed", str(e))
             raise
