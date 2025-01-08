@@ -1,47 +1,28 @@
-
 from shopify_client import ShopifyClient
 from loguru import logger
 
 def test_orders():
     try:
         client = ShopifyClient()
-        # Get first order
-        query = """
-        query {
-            orders(first: 1) {
-                edges {
-                    node {
-                        id
-                        name
-                        createdAt
-                        totalPrice
-                        lineItems(first: 1) {
-                            edges {
-                                node {
-                                    title
-                                    quantity
-                                    originalUnitPrice
-                                    sku
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        """
-        result = client._execute_query(query)
-        logger.info("Raw Shopify Response:")
-        logger.info(result)
-        
-        if 'data' in result and 'orders' in result['data']:
-            orders = result['data']['orders']
-            if orders['edges']:
-                order = orders['edges'][0]['node']
-                logger.info(f"Order details:")
-                logger.info(f"ID: {order['id']}")
-                logger.info(f"Name: {order['name']}")
-                logger.info(f"Total Price: {order['totalPrice']}")
+        logger.info("Fetching orders from Shopify...")
+        count = 0
+        for order in client.iter_recent_orders(days=30):
+            count += 1
+            logger.info(f"\nOrder #{count}:")
+            logger.info(f"Order Name: {order['order_name']}")
+            logger.info(f"Order ID: {order['id']}")
+            logger.info(f"Created At: {order['created_at']}")
+            logger.info(f"Total Price: {order['total_price']}")
+            logger.info("Items:")
+            for item in order['items']:
+                logger.info(f"- {item['title']} (x{item['quantity']}) @ {item['original_price']}")
+
+            if count >= 5:  # Limit to first 5 orders for testing
+                break
+
+        if count == 0:
+            logger.warning("No orders found in Shopify")
+
     except Exception as e:
         logger.error(f"Error testing orders: {str(e)}")
         raise
