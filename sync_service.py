@@ -83,7 +83,8 @@ class SyncService:
                             shopify_order_id=order_data['id'],
                             order_name=order_data['order_name'],
                             created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                            total_price=safe_decimal(order_data['total_price'])
+                            total_price=safe_decimal(order_data['total_price']),
+                            sales_channel=order_data.get('salesChannel', {}).get('name')
                         )
                         self.session.add(sale)
                         self.session.flush()

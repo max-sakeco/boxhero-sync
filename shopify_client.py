@@ -105,6 +105,9 @@ class ShopifyClient:
                         name
                         createdAt
                         totalPrice
+                        salesChannel {
+                            name
+                        }
                         lineItems(first: 50) {
                             edges {
                                 node {

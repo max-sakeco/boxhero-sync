@@ -32,6 +32,7 @@ class ShopifySale(Base):
     order_name = Column(String)
     created_at = Column(DateTime)
     total_price = Column(Numeric(10, 2))
+    sales_channel = Column(String)
     synced_at = Column(DateTime, default=datetime.utcnow)
 
 class ShopifySaleItem(Base):

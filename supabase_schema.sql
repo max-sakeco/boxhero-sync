@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS shopify_sales (
     order_name VARCHAR,
     created_at TIMESTAMPTZ,
     total_price DECIMAL(10,2),
+    sales_channel VARCHAR,
     synced_at TIMESTAMPTZ DEFAULT NOW()
 );
 
