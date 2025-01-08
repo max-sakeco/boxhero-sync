@@ -41,8 +41,10 @@ class SyncService:
                 product.sku = product_data.get('sku')
                 product.barcode = product_data.get('barcode')
                 product.inventory_quantity = product_data.get('quantity', 0)
-                product.price = Decimal(product_data.get('price', '0'))
-                product.compare_at_price = Decimal(product_data.get('cost', '0'))
+                price = product_data.get('price')
+                cost = product_data.get('cost')
+                product.price = Decimal(str(price)) if price is not None else Decimal('0')
+                product.compare_at_price = Decimal(str(cost)) if cost is not None else Decimal('0')
                 product.image_url = product_data.get('photo_url')
                 product.last_synced_at = datetime.utcnow()
 
@@ -70,7 +72,7 @@ class SyncService:
                     shopify_order_id=order_data['id'],
                     order_name=order_data['order_name'],
                     created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                    total_price=Decimal(order_data['total_price'])
+                    total_price=Decimal(str(order_data['total_price']))
                 )
                 self.session.add(sale)
                 self.session.flush()  # Get sale.id
