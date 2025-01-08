@@ -108,6 +108,9 @@ class SyncService:
                 except Exception as e:
                     self.session.rollback()
                     logger.error(f"Error processing sale {order_data['order_name']}: {str(e)}")
+                    # Drop and recreate tables to ensure schema is correct
+                    Base.metadata.drop_all(bind=self.session.bind)
+                    Base.metadata.create_all(bind=self.session.bind)
                     raise
                 
             if orders_count == 0:
