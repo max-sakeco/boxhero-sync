@@ -45,7 +45,7 @@ class SaleItem(Base):
     original_price = Column(Numeric(10, 2))
     discounted_price = Column(Numeric(10, 2))
     sku = Column(String)
-    sale = relationship("Sale", backref="items", cascade="all, delete-orphan")
+    sale = relationship("Sale", backref=backref("items", cascade="all, delete"))
 
 class Item(Base):
     __tablename__ = 'items'
