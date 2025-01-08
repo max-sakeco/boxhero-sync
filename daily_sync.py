@@ -5,11 +5,9 @@ from loguru import logger
 def run_daily_sync():
     service = SyncService()
     try:
-        # Skip product sync for testing
-        logger.info("Starting sales sync")
+        # Only sync sales for testing
         service.sync_recent_sales(days=1)
-        
-        logger.info("Daily sync completed successfully")
+        logger.info("Sales sync completed successfully")
     except Exception as e:
         logger.error(f"Daily sync failed: {str(e)}")
         raise
