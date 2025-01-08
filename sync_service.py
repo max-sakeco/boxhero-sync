@@ -88,18 +88,21 @@ class SyncService:
                 self.session.flush()  # Get sale.id
                 logger.info(f"Created sale record: {sale.order_name} with ID {sale.id}")
                 
+                # Create all sale items at once
+                sale_items = []
                 for item in order_data['items']:
                     logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
-                    sale_item = SaleItem(
-                        sale_id=sale.id,
-                        title=item['title'],
-                        quantity=item['quantity'],
-                        original_price=safe_decimal(item['original_price']),
-                        discounted_price=safe_decimal(item['discounted_price']),
-                        sku=item['sku']
+                    sale_items.append(
+                        SaleItem(
+                            sale=sale,  # Use relationship instead of sale_id
+                            title=item['title'],
+                            quantity=item['quantity'],
+                            original_price=safe_decimal(item['original_price']),
+                            discounted_price=safe_decimal(item['discounted_price']),
+                            sku=item['sku']
+                        )
                     )
-                    self.session.add(sale_item)
-                
+                self.session.add_all(sale_items)
                 sync_log.records_processed = (sync_log.records_processed or 0) + 1
                 self.session.commit()  # Commit after each order
                 
