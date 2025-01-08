@@ -6,11 +6,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from models import Item, SyncLog, get_session
 from boxhero_client import BoxHeroClient
+from supabase_service import SupabaseService
 
 class SyncService:
     def __init__(self):
         self.client = BoxHeroClient()
         self.session = get_session()
+        self.supabase = SupabaseService()
 
     def _create_sync_log(self) -> SyncLog:
         """Create a new sync log entry"""
@@ -56,6 +58,9 @@ class SyncService:
                 logger.info(f"Updated existing item: {item_data['name']}")
 
             self.session.commit()
+            
+            # Sync to Supabase
+            self.supabase.sync_item(item_attrs)
 
         except Exception as e:
             self.session.rollback()
