@@ -13,6 +13,7 @@ def test_orders():
             logger.info(f"Order ID: {order['id']}")
             logger.info(f"Created At: {order['created_at']}")
             logger.info(f"Total Price: {order['total_price']}")
+            logger.info(f"Sales Channel: {order.get('sales_channel', 'N/A')}")
             logger.info("Items:")
             for item in order['items']:
                 logger.info(f"- {item['title']} (x{item['quantity']}) @ {item['original_price']}")
