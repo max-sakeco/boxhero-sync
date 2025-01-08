@@ -16,14 +16,8 @@ def sync_job():
     """Execute the sync job"""
     logger.info("Starting sync job")
     try:
-        service = SyncService()
-        logger.info("Starting product sync")
-        service.sync_products()
-        logger.info("Product sync completed")
-        
-        logger.info("Starting sales sync")
-        service.sync_recent_sales(days=1)
-        logger.info("Sales sync completed")
+        from ordered_sync import run_ordered_sync
+        run_ordered_sync()
     except Exception as e:
         logger.error(f"Sync job failed: {str(e)}", exc_info=True)
         raise
