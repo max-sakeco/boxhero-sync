@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from decimal import Decimal
 from utils import safe_decimal
-from models import Product, Sale, SaleItem, SyncLog, get_session
+from models import Product, SaleItem, SyncLog, get_session
 from shopify_client import ShopifyClient
 
 class SyncService:
@@ -70,27 +70,31 @@ class SyncService:
                 logger.info(f"Found order {orders_count}: {order_data['order_name']}")
                 logger.info(f"Processing order: {order_data['order_name']}")
                 
-                # Skip if any items from this order already exist
-                if self.session.query(SaleItem).filter_by(shopify_order_id=order_data['id']).first():
-                    logger.info(f"Order {order_data['order_name']} already exists, skipping")
-                    continue
-                
-                try:
-                    # Process items one by one
-                    for item in order_data['items']:
-                        logger.info(f"Processing item: {item['title']} for order {order_data['order_name']}")
-                        sale_item = SaleItem(
-                            shopify_order_id=order_data['id'],
-                            order_name=order_data['order_name'],
-                            created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                            total_price=safe_decimal(order_data['total_price']),
-                            title=item['title'],
-                            quantity=item['quantity'],
-                            original_price=safe_decimal(item['original_price']),
-                            discounted_price=safe_decimal(item['discounted_price']),
-                            sku=item['sku']
-                        )
-                        self.session.add(sale_item)
+                # Process items one by one
+                for item in order_data['items']:
+                    # Skip if this specific item from this order already exists
+                    existing_item = self.session.query(SaleItem).filter_by(
+                        shopify_order_id=order_data['id'],
+                        title=item['title']
+                    ).first()
+                    
+                    if existing_item:
+                        logger.info(f"Item {item['title']} from order {order_data['order_name']} already exists, skipping")
+                        continue
+                        
+                    logger.info(f"Processing item: {item['title']} for order {order_data['order_name']}")
+                    sale_item = SaleItem(
+                        shopify_order_id=order_data['id'],
+                        order_name=order_data['order_name'],
+                        created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
+                        total_price=safe_decimal(order_data['total_price']),
+                        title=item['title'],
+                        quantity=item['quantity'],
+                        original_price=safe_decimal(item['original_price']),
+                        discounted_price=safe_decimal(item['discounted_price']),
+                        sku=item['sku']
+                    )
+                    self.session.add(sale_item)
                     
                     sync_log.records_processed = (sync_log.records_processed or 0) + 1
                     self.session.commit()
