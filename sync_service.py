@@ -69,30 +69,21 @@ class SyncService:
                 orders_count += 1
                 logger.info(f"Found order {orders_count}: {order_data['order_name']}")
                 logger.info(f"Processing order: {order_data['order_name']}")
-                # Skip if order already exists
-                if self.session.query(Sale).filter_by(shopify_order_id=order_data['id']).first():
+                
+                # Skip if any items from this order already exist
+                if self.session.query(SaleItem).filter_by(shopify_order_id=order_data['id']).first():
                     logger.info(f"Order {order_data['order_name']} already exists, skipping")
                     continue
-                    
-                from utils import safe_decimal
                 
-                # Clean and convert price string
-                from utils import safe_decimal
                 try:
-                    sale = Sale(
-                        shopify_order_id=order_data['id'],
-                        order_name=order_data['order_name'],
-                        created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                        total_price=safe_decimal(order_data['total_price'])
-                    )
-                    self.session.add(sale)
-                    self.session.commit()
-                    
-                    # Process items one by one after sale is committed
+                    # Process items one by one
                     for item in order_data['items']:
-                        logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
+                        logger.info(f"Processing item: {item['title']} for order {order_data['order_name']}")
                         sale_item = SaleItem(
-                            sale_id=sale.id,
+                            shopify_order_id=order_data['id'],
+                            order_name=order_data['order_name'],
+                            created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
+                            total_price=safe_decimal(order_data['total_price']),
                             title=item['title'],
                             quantity=item['quantity'],
                             original_price=safe_decimal(item['original_price']),

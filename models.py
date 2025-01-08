@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, create_engine, JSON, Numeric
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, backref
@@ -10,7 +9,7 @@ Base = declarative_base()
 
 class Product(Base):
     __tablename__ = 'shopify_products'
-    
+
     id = Column(Integer, primary_key=True)
     shopify_id = Column(String, unique=True, nullable=False)
     title = Column(String, nullable=False)
@@ -25,43 +24,20 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class Sale(Base):
-    __tablename__ = 'shopify_sales'
-    
+class SaleItem(Base):
+    __tablename__ = 'shopify_sales_items'
+
     id = Column(Integer, primary_key=True)
-    shopify_order_id = Column(String, unique=True, nullable=False)
+    shopify_order_id = Column(String, nullable=False)
     order_name = Column(String)
     created_at = Column(DateTime)
     total_price = Column(Numeric(10, 2))
-    synced_at = Column(DateTime, default=datetime.utcnow)
-
-class SaleItem(Base):
-    __tablename__ = 'sale_items'
-    
-    id = Column(Integer, primary_key=True)
-    sale_id = Column(Integer, ForeignKey('shopify_sales.id', ondelete='CASCADE'), nullable=False)
     title = Column(String, nullable=False)
     quantity = Column(Integer)
     original_price = Column(Numeric(10, 2))
     discounted_price = Column(Numeric(10, 2))
     sku = Column(String)
-    sale = relationship("Sale", backref=backref("items", cascade="all, delete"))
-
-class Item(Base):
-    __tablename__ = 'items'
-
-    id = Column(Integer, primary_key=True)
-    boxhero_id = Column(String, unique=True, nullable=False)
-    name = Column(String, nullable=False)
-    sku = Column(String)
-    barcode = Column(String)
-    photo_url = Column(String)
-    cost = Column(String)
-    price = Column(String)
-    quantity = Column(Integer)
-    attrs = Column(JSON)  # Store attributes as JSON
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    synced_at = Column(DateTime, default=datetime.utcnow)
 
 class SyncLog(Base):
     __tablename__ = 'sync_logs'

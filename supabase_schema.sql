@@ -15,24 +15,18 @@ CREATE TABLE IF NOT EXISTS shopify_products (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS shopify_sales (
+CREATE TABLE IF NOT EXISTS shopify_sales_items (
     id SERIAL PRIMARY KEY,
-    shopify_order_id VARCHAR UNIQUE NOT NULL,
+    shopify_order_id VARCHAR NOT NULL,
     order_name VARCHAR,
     created_at TIMESTAMPTZ,
     total_price DECIMAL(10,2),
-    synced_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS sale_items (
-    id SERIAL PRIMARY KEY,
-    sale_id INTEGER REFERENCES shopify_sales(id) NOT NULL,
     title VARCHAR NOT NULL,
     quantity INTEGER,
     original_price DECIMAL(10,2),
     discounted_price DECIMAL(10,2),
     sku VARCHAR,
-    CONSTRAINT fk_sale FOREIGN KEY (sale_id) REFERENCES shopify_sales(id) ON DELETE CASCADE
+    synced_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS sync_logs (
