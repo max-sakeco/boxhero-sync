@@ -106,7 +106,11 @@ class ShopifyClient:
                         createdAt
                         totalPrice
                         displayFinancialStatus
-                        channel
+                        channelInformation {
+                            channelDefinition {
+                                name
+                            }
+                        }
                         lineItems(first: 50) {
                             edges {
                                 node {
@@ -142,7 +146,7 @@ class ShopifyClient:
                     'order_name': order['name'],
                     'created_at': order['createdAt'],
                     'total_price': str(order.get('totalPrice', '0.00')),
-                    'sales_channel': order.get('channel'),
+                    'sales_channel': order.get('channelInformation', {}).get('channelDefinition', {}).get('name'),
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
