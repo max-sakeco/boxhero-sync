@@ -81,8 +81,8 @@ class ShopifyClient:
                     'sku': variant.get('sku'),
                     'barcode': variant.get('barcode'),
                     'quantity': variant.get('inventoryQuantity', 0),
-                    'price': str(variant.get('price', 0)),
-                    'cost': str(variant.get('compareAtPrice', 0)),
+                    'price': str(variant.get('price', '0.00')),
+                    'cost': str(variant.get('compareAtPrice', '0.00')),
                     'photo_url': image_url,
                     'attrs': []
                 }
@@ -137,8 +137,8 @@ class ShopifyClient:
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
-                        'original_price': item['node']['originalUnitPrice'],
-                        'discounted_price': item['node']['discountedUnitPrice'],
+                        'original_price': str(item['node']['originalUnitPrice'] or '0.00'),
+                        'discounted_price': str(item['node']['discountedUnitPrice'] or '0.00'),
                         'sku': item['node']['sku']
                     } for item in order['lineItems']['edges']]
                 }
