@@ -87,6 +87,7 @@ class SyncService:
                 self.session.add(sale)
                 self.session.flush()
                 self.session.refresh(sale)
+                self.session.commit()
                 logger.info(f"Created sale record: {sale.order_name} with ID {sale.id}")
                 
                 # Create all sale items at once

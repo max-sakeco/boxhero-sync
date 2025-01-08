@@ -39,7 +39,7 @@ class SaleItem(Base):
     __tablename__ = 'sale_items'
     
     id = Column(Integer, primary_key=True)
-    sale_id = Column(Integer, ForeignKey('shopify_sales.id'), nullable=False)
+    sale_id = Column(Integer, ForeignKey('shopify_sales.id', ondelete='CASCADE'), nullable=False)
     title = Column(String, nullable=False)
     quantity = Column(Integer)
     original_price = Column(Numeric(10, 2))
