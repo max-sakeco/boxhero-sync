@@ -11,7 +11,7 @@ class SupabaseSync:
     def sync_products(self):
         products = self.session.query(Product).all()
         for product in products:
-            self.supabase.client.table('products').upsert({
+            self.supabase.client.table('shopify_products').upsert({
                 'shopify_id': product.shopify_id,
                 'title': product.title,
                 'description': product.description,
