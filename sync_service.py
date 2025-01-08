@@ -84,7 +84,7 @@ class SyncService:
                             order_name=order_data['order_name'],
                             created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
                             total_price=safe_decimal(order_data['total_price']),
-                            sales_channel=order_data.get('salesChannel', {}).get('name')
+                            sales_channel=order_data.get('sales_channel')
                         )
                         self.session.add(sale)
                         self.session.flush()
