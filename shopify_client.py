@@ -128,8 +128,14 @@ class ShopifyClient:
         cursor = None
         while True:
             result = self._execute_query(query, {'cursor': cursor})
+            if 'errors' in result:
+                logger.error(f"Shopify API error: {result['errors']}")
+                raise ValueError(f"Shopify API error: {result['errors']}")
+            if 'data' not in result:
+                logger.error(f"Unexpected API response: {result}")
+                raise ValueError("API response missing 'data' field")
             orders = result['data']['orders']
-
+            
             for edge in orders['edges']:
                 order = edge['node']
                 yield {

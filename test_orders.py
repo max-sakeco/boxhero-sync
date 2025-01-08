@@ -25,6 +25,7 @@ def test_orders():
 
     except Exception as e:
         logger.error(f"Error testing orders: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
         raise
 
 if __name__ == "__main__":
