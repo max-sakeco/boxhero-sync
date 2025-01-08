@@ -69,9 +69,14 @@ class SyncService:
                     continue
                     
                 # Ensure clean decimal string
-                total_price = order_data['total_price'].strip() if order_data['total_price'] else '0.00'
-                if not total_price or total_price.lower() == 'none':
+                total_price = order_data['total_price']
+                if total_price is None or total_price == '' or total_price.lower() == 'none':
                     total_price = '0.00'
+                else:
+                    # Remove any currency symbols and whitespace
+                    total_price = ''.join(c for c in total_price if c.isdigit() or c in '.-')
+                    if not total_price:
+                        total_price = '0.00'
                     
                 sale = Sale(
                     shopify_order_id=order_data['id'],
