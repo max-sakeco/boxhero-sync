@@ -38,8 +38,8 @@ class SupabaseSync:
                 'created_at': sale.created_at.isoformat() if sale.created_at else None,
                 'total_price': float(sale.total_price) if sale.total_price else None,
                 'sales_channel': sale.sales_channel,
-                'synced_at': datetime.utcnow().isoformat()
-            }).execute()
+                'synced_at': datetime.now(datetime.UTC).isoformat()
+            }, on_conflict='shopify_order_id').execute()
 
             # Get the Supabase sale ID from the response
             supabase_sale = sale_result.data[0]
