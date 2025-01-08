@@ -91,9 +91,10 @@ class ShopifyClient:
             cursor = products['pageInfo']['endCursor']
 
     def iter_recent_orders(self, days: int = 30) -> Generator[Dict, None, None]:
+        logger.info("Fetching orders from Shopify API")
         query = """
         query($cursor: String) {
-            orders(first: 50, after: $cursor, query: "created_at:>=2024-01-01") {
+            orders(first: 50, after: $cursor) {
                 pageInfo {
                     hasNextPage
                     endCursor

@@ -86,8 +86,10 @@ class SyncService:
                 )
                 self.session.add(sale)
                 self.session.flush()  # Get sale.id
+                logger.info(f"Created sale record: {sale.order_name} with ID {sale.id}")
                 
                 for item in order_data['items']:
+                    logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
                     sale_item = SaleItem(
                         sale_id=sale.id,
                         title=item['title'],
