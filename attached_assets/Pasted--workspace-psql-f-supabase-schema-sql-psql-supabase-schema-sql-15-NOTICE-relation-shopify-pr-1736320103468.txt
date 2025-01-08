@@ -1,0 +1,31 @@
+~/workspace$ psql -f supabase_schema.sql
+
+psql:supabase_schema.sql:15: NOTICE:  relation "shopify_products" already exists, skipping
+CREATE TABLE
+psql:supabase_schema.sql:25: NOTICE:  relation "shopify_sales" already exists, skipping
+CREATE TABLE
+psql:supabase_schema.sql:36: NOTICE:  relation "shopify_sale_items" already exists, skipping
+CREATE TABLE
+DO
+psql:supabase_schema.sql:57: NOTICE:  relation "sync_logs" already exists, skipping
+CREATE TABLE
+~/workspace$ python supabase_sync.py
+2025-01-08 07:07:57.067 | INFO     | __main__:sync_all:63 - Starting Supabase sync
+2025-01-08 07:08:15.005 | INFO     | __main__:sync_products:29 - Synced 159 products to Supabase
+/home/runner/workspace/supabase_sync.py:41: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'synced_at': datetime.utcnow().isoformat()
+/home/runner/workspace/supabase_sync.py:56: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'synced_at': datetime.utcnow().isoformat()
+2025-01-08 07:08:16.015 | ERROR    | __main__:sync_all:68 - Supabase sync failed: {'code': 'PGRST204', 'details': None, 'hint': None, 'message': "Could not find the 'synced_at' column of 'shopify_sale_items' in the schema cache"}
+Traceback (most recent call last):
+  File "/home/runner/workspace/supabase_sync.py", line 73, in <module>
+    sync.sync_all()
+  File "/home/runner/workspace/supabase_sync.py", line 65, in sync_all
+    self.sync_sales()
+  File "/home/runner/workspace/supabase_sync.py", line 57, in sync_sales
+    }).execute()
+       ^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/postgrest/_sync/request_builder.py", line 78, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': 'PGRST204', 'details': None, 'hint': None, 'message': "Could not find the 'synced_at' column of 'shopify_sale_items' in the schema cache"}
+~/workspace$ 
