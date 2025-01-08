@@ -79,31 +79,32 @@ class SyncService:
                 # Clean and convert price string
                 from utils import safe_decimal
                 try:
-                    sale = Sale(
-                        shopify_order_id=order_data['id'],
-                        order_name=order_data['order_name'],
-                        created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                        total_price=safe_decimal(order_data['total_price'])
-                    )
-                    self.session.add(sale)
-                    self.session.flush()
-                    self.session.refresh(sale)
-                    
-                    # Process items one by one
-                    for item in order_data['items']:
-                        logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
-                        sale_item = SaleItem(
-                            sale_id=sale.id,
-                            title=item['title'],
-                            quantity=item['quantity'],
-                            original_price=safe_decimal(item['original_price']),
-                            discounted_price=safe_decimal(item['discounted_price']),
-                            sku=item['sku']
+                    with self.session.no_autoflush:
+                        sale = Sale(
+                            shopify_order_id=order_data['id'],
+                            order_name=order_data['order_name'],
+                            created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
+                            total_price=safe_decimal(order_data['total_price'])
                         )
-                        self.session.add(sale_item)
-                    
-                    sync_log.records_processed = (sync_log.records_processed or 0) + 1
-                    self.session.commit()
+                        self.session.add(sale)
+                        self.session.flush()
+                        self.session.refresh(sale)
+                        
+                        # Process items one by one
+                        for item in order_data['items']:
+                            logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
+                            sale_item = SaleItem(
+                                sale_id=sale.id,
+                                title=item['title'],
+                                quantity=item['quantity'],
+                                original_price=safe_decimal(item['original_price']),
+                                discounted_price=safe_decimal(item['discounted_price']),
+                                sku=item['sku']
+                            )
+                            self.session.add(sale_item)
+                        
+                        sync_log.records_processed = (sync_log.records_processed or 0) + 1
+                        self.session.commit()
                 except Exception as e:
                     self.session.rollback()
                     logger.error(f"Error processing sale {order_data['order_name']}: {str(e)}")
