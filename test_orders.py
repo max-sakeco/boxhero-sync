@@ -14,19 +14,14 @@ def test_orders():
                         id
                         name
                         createdAt
-                        totalPrice {
-                            amount
-                            currencyCode
-                        }
+                        totalPrice
                         lineItems(first: 1) {
                             edges {
                                 node {
                                     title
                                     quantity
-                                    originalUnitPrice {
-                                        amount
-                                        currencyCode
-                                    }
+                                    originalUnitPrice
+                                    sku
                                 }
                             }
                         }
