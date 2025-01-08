@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS shopify_products (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS sales (
+CREATE TABLE IF NOT EXISTS shopify_sales (
     id SERIAL PRIMARY KEY,
     shopify_order_id VARCHAR UNIQUE NOT NULL,
     order_name VARCHAR,

@@ -38,7 +38,7 @@ class SupabaseSync:
                 'total_price': float(sale.total_price) if sale.total_price else None,
                 'synced_at': sale.synced_at.isoformat()
             }
-            result = self.supabase.client.table('sales').upsert(
+            result = self.supabase.client.table('shopify_sales').upsert(
                 sale_data, 
                 on_conflict='shopify_order_id'
             ).execute()

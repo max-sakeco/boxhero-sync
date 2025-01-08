@@ -26,7 +26,7 @@ class Product(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class Sale(Base):
-    __tablename__ = 'sales'
+    __tablename__ = 'shopify_sales'
     
     id = Column(Integer, primary_key=True)
     shopify_order_id = Column(String, unique=True, nullable=False)
