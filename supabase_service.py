@@ -22,9 +22,11 @@ class SupabaseService:
     def sync_item(self, item_data: dict):
         try:
             attrs = item_data['attrs']
-            self.client.table('boxhero').upsert({
-                'boxhero_id': item_data['boxhero_id'],
-                'name': item_data['name'],
+            # Use on_conflict parameter to specify the unique column
+            self.client.table('boxhero').upsert(
+                {
+                    'boxhero_id': item_data['boxhero_id'],
+                    'name': item_data['name'],
                 'sku': item_data['sku'],
                 'barcode': item_data['barcode'],
                 'photo_url': item_data['photo_url'],
@@ -38,7 +40,9 @@ class SupabaseService:
                 'minimum_stock': self._get_attr_value(attrs, 'Minimum Stock'),
                 'client_sku': self._get_attr_value(attrs, 'CLIENT SKU'),
                 'entry_date': self._get_attr_value(attrs, 'Date of Entry')
-            }).execute()
+            }, 
+            on_conflict='boxhero_id'  # Specify the column to check for conflicts
+            ).execute()
             logger.info(f"Synced item to Supabase: {item_data['name']}")
         except Exception as e:
             logger.error(f"Error syncing to Supabase: {str(e)}")
