@@ -1,4 +1,3 @@
-
 import os
 from typing import Generator, Dict
 import requests
@@ -8,10 +7,10 @@ class ShopifyClient:
     def __init__(self):
         self.shop_url = os.getenv('SHOPIFY_SHOP_URL')
         self.access_token = os.getenv('SHOPIFY_API_KEY')
-        
+
         if not self.shop_url or not self.access_token:
             raise ValueError("Shopify credentials not found in environment")
-            
+
         self.api_url = f"https://{self.shop_url}/admin/api/2024-01/graphql.json"
         self.headers = {
             'Content-Type': 'application/json',
@@ -63,17 +62,17 @@ class ShopifyClient:
             }
         }
         """
-        
+
         cursor = None
         while True:
             result = self._execute_query(query, {'cursor': cursor})
             products = result['data']['products']
-            
+
             for edge in products['edges']:
                 product = edge['node']
                 variant = product['variants']['edges'][0]['node'] if product['variants']['edges'] else {}
                 image_url = product['images']['edges'][0]['node']['url'] if product['images']['edges'] else None
-                
+
                 yield {
                     'id': product['id'].split('/')[-1],
                     'name': product['title'],
@@ -86,7 +85,7 @@ class ShopifyClient:
                     'photo_url': image_url,
                     'attrs': []
                 }
-            
+
             if not products['pageInfo']['hasNextPage']:
                 break
             cursor = products['pageInfo']['endCursor']
@@ -121,28 +120,28 @@ class ShopifyClient:
             }
         }
         """
-        
+
         cursor = None
         while True:
             result = self._execute_query(query, {'cursor': cursor})
             orders = result['data']['orders']
-            
+
             for edge in orders['edges']:
                 order = edge['node']
                 yield {
                     'id': order['id'].split('/')[-1],
                     'order_name': order['name'],
                     'created_at': order['createdAt'],
-                    'total_price': str(order.get('totalPrice', '0.00')),
+                    'total_price': '0.00' if not order.get('totalPrice') else order['totalPrice'].strip(),
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
-                        'original_price': str(item['node'].get('originalUnitPrice', '0.00') or '0.00'),
-                        'discounted_price': str(item['node'].get('discountedUnitPrice', '0.00') or '0.00'),
+                        'original_price': '0.00' if not item['node'].get('originalUnitPrice') else str(item['node']['originalUnitPrice']).strip(),
+                        'discounted_price': '0.00' if not item['node'].get('discountedUnitPrice') else str(item['node']['discountedUnitPrice']).strip(),
                         'sku': item['node'].get('sku', '')
                     } for item in order['lineItems']['edges']]
                 }
-            
+
             if not orders['pageInfo']['hasNextPage']:
                 break
             cursor = orders['pageInfo']['endCursor']
