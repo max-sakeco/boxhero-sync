@@ -85,7 +85,8 @@ class SyncService:
                     total_price=safe_decimal(order_data['total_price'])
                 )
                 self.session.add(sale)
-                self.session.commit()  # Commit the sale first
+                self.session.flush()
+                self.session.refresh(sale)
                 logger.info(f"Created sale record: {sale.order_name} with ID {sale.id}")
                 
                 # Create all sale items at once
