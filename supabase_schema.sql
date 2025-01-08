@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS shopify_products (
     id SERIAL PRIMARY KEY,
     shopify_id VARCHAR UNIQUE NOT NULL,
