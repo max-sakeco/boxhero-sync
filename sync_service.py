@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from decimal import Decimal
-
+from utils import safe_decimal
 from models import Product, Sale, SaleItem, SyncLog, get_session
 from shopify_client import ShopifyClient
 
