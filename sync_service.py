@@ -68,34 +68,24 @@ class SyncService:
                 if self.session.query(Sale).filter_by(shopify_order_id=order_data['id']).first():
                     continue
                     
-                # Ensure clean decimal string
-                total_price = order_data['total_price']
-                if total_price is None or total_price == '' or total_price.lower() == 'none':
-                    total_price = '0.00'
-                else:
-                    # Remove any currency symbols and whitespace
-                    total_price = ''.join(c for c in total_price if c.isdigit() or c in '.-')
-                    if not total_price:
-                        total_price = '0.00'
-                    
+                from utils import safe_decimal
+                
                 sale = Sale(
                     shopify_order_id=order_data['id'],
                     order_name=order_data['order_name'],
                     created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                    total_price=Decimal(total_price)
+                    total_price=safe_decimal(order_data['total_price'])
                 )
                 self.session.add(sale)
                 self.session.flush()  # Get sale.id
                 
                 for item in order_data['items']:
-                    original_price = '0.00' if not item['original_price'] else item['original_price']
-                    discounted_price = '0.00' if not item['discounted_price'] else item['discounted_price']
                     sale_item = SaleItem(
                         sale_id=sale.id,
                         title=item['title'],
                         quantity=item['quantity'],
-                        original_price=Decimal(str(original_price)),
-                        discounted_price=Decimal(str(discounted_price)),
+                        original_price=safe_decimal(item['original_price']),
+                        discounted_price=safe_decimal(item['discounted_price']),
                         sku=item['sku']
                     )
                     self.session.add(sale_item)

@@ -132,12 +132,12 @@ class ShopifyClient:
                     'id': order['id'].split('/')[-1],
                     'order_name': order['name'],
                     'created_at': order['createdAt'],
-                    'total_price': '0.00' if not order.get('totalPrice') else order['totalPrice'].strip(),
+                    'total_price': str(order.get('totalPrice', '0.00')),
                     'items': [{
                         'title': item['node']['title'],
                         'quantity': item['node']['quantity'],
-                        'original_price': '0.00' if not item['node'].get('originalUnitPrice') else str(item['node']['originalUnitPrice']).strip(),
-                        'discounted_price': '0.00' if not item['node'].get('discountedUnitPrice') else str(item['node']['discountedUnitPrice']).strip(),
+                        'original_price': str(item['node'].get('originalUnitPrice', '0.00')),
+                        'discounted_price': str(item['node'].get('discountedUnitPrice', '0.00')),
                         'sku': item['node'].get('sku', '')
                     } for item in order['lineItems']['edges']]
                 }
