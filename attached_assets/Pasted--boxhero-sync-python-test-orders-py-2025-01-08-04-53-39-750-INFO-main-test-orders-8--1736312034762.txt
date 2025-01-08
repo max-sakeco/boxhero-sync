@@ -1,0 +1,28 @@
+~/boxhero-sync$ python test_orders.py
+2025-01-08 04:53:39.750 | INFO     | __main__:test_orders:8 - Testing Shopify Orders API...
+2025-01-08 04:53:39.751 | INFO     | __main__:test_orders:9 - Fetching orders from Shopify...
+2025-01-08 04:53:39.751 | INFO     | shopify_client:iter_recent_orders:94 - Fetching orders from Shopify API
+2025-01-08 04:53:40.351 | INFO     | __main__:test_orders:13 - 
+Order #1:
+2025-01-08 04:53:40.351 | INFO     | __main__:test_orders:14 - Order Name: #1001
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:15 - Order ID: 5020210135277
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:16 - Created At: 2022-10-30T09:36:26Z
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:17 - Total Price: 0.00
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:18 - Sales Channel: pos
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:19 - --------------------------------------------------
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:20 - Items:
+2025-01-08 04:53:40.352 | INFO     | __main__:test_orders:22 - - HANAGUMORI (x2) @ 0.00
+2025-01-08 04:53:40.353 | INFO     | __main__:test_orders:22 - - HANAGUMORI -THE SAN (x1) @ 0.00
+2025-01-08 04:53:40.353 | INFO     | __main__:test_orders:22 - - LAB01 (x1) @ 0.00
+2025-01-08 04:53:40.353 | ERROR    | __main__:test_orders:31 - Error testing orders: 'NoneType' object has no attribute 'get'
+2025-01-08 04:53:40.353 | ERROR    | __main__:test_orders:32 - Error type: <class 'AttributeError'>
+Traceback (most recent call last):
+  File "/home/runner/boxhero-sync/test_orders.py", line 36, in <module>
+    test_orders()
+  File "/home/runner/boxhero-sync/test_orders.py", line 11, in test_orders
+    for order in client.iter_recent_orders(days=30):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/boxhero-sync/shopify_client.py", line 149, in iter_recent_orders
+    'sales_channel': order.get('channelInformation', {}).get('channelDefinition', {}).get('handle'),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
