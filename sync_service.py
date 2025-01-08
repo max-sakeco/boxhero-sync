@@ -78,12 +78,14 @@ class SyncService:
                 self.session.flush()  # Get sale.id
                 
                 for item in order_data['items']:
+                    original_price = '0.00' if not item['original_price'] else item['original_price']
+                    discounted_price = '0.00' if not item['discounted_price'] else item['discounted_price']
                     sale_item = SaleItem(
                         sale_id=sale.id,
                         title=item['title'],
                         quantity=item['quantity'],
-                        original_price=Decimal(item['original_price']),
-                        discounted_price=Decimal(item['discounted_price']),
+                        original_price=Decimal(str(original_price)),
+                        discounted_price=Decimal(str(discounted_price)),
                         sku=item['sku']
                     )
                     self.session.add(sale_item)
