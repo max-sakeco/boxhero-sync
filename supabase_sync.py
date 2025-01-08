@@ -1,6 +1,6 @@
 
 from supabase_service import SupabaseService
-from models import get_session, Product, Sale, SaleItem, SyncLog
+from models import get_session, Product, ShopifySale, ShopifySaleItem, SyncLog
 from loguru import logger
 
 class SupabaseSync:
@@ -28,7 +28,7 @@ class SupabaseSync:
         logger.info(f"Synced {len(products)} products to Supabase")
 
     def sync_sales(self):
-        sales = self.session.query(Sale).all()
+        sales = self.session.query(ShopifySale).all()
         for sale in sales:
             # Insert sale
             sale_data = {
