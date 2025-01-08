@@ -85,7 +85,7 @@ class SyncService:
                     total_price=safe_decimal(order_data['total_price'])
                 )
                 self.session.add(sale)
-                self.session.flush()  # Get sale.id
+                self.session.commit()  # Commit the sale first
                 logger.info(f"Created sale record: {sale.order_name} with ID {sale.id}")
                 
                 # Create all sale items at once
@@ -94,7 +94,7 @@ class SyncService:
                     logger.info(f"Processing item: {item['title']} for order {sale.order_name}")
                     sale_items.append(
                         SaleItem(
-                            sale=sale,  # Use relationship instead of sale_id
+                            sale_id=sale.id,  # Use direct ID instead of relationship
                             title=item['title'],
                             quantity=item['quantity'],
                             original_price=safe_decimal(item['original_price']),
@@ -104,7 +104,7 @@ class SyncService:
                     )
                 self.session.add_all(sale_items)
                 sync_log.records_processed = (sync_log.records_processed or 0) + 1
-                self.session.commit()  # Commit after each order
+                self.session.commit()  # Commit the items
                 
             if orders_count == 0:
                 logger.warning("No orders found to sync")
