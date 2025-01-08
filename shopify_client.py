@@ -7,14 +7,16 @@ from typing import Generator, Dict
 class ShopifyClient:
     def __init__(self):
         shop_url = os.getenv('SHOPIFY_SHOP_URL')
-        api_key = os.getenv('SHOPIFY_API_KEY')
-        password = os.getenv('SHOPIFY_PASSWORD')
+        access_token = os.getenv('SHOPIFY_API_KEY')
         
-        if not all([shop_url, api_key, password]):
+        if not shop_url or not access_token:
             raise ValueError("Shopify credentials not found in environment")
             
-        shop_url = f"https://{api_key}:{password}@{shop_url}"
-        shopify.ShopifyResource.set_site(shop_url)
+        api_version = '2024-01'
+        shop_url = f"https://{shop_url}/admin/api/{api_version}"
+        
+        session = shopify.Session(shop_url, api_version, access_token)
+        shopify.ShopifyResource.activate_session(session)
         
     def iter_all_products(self) -> Generator[Dict, None, None]:
         """Iterator to fetch all products"""
