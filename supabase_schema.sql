@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS shopify_sales (
 
 CREATE TABLE IF NOT EXISTS sale_items (
     id SERIAL PRIMARY KEY,
-    sale_id INTEGER REFERENCES sales(id),
+    sale_id INTEGER REFERENCES shopify_sales(id),
     title VARCHAR NOT NULL,
     quantity INTEGER,
     original_price DECIMAL(10,2),
