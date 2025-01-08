@@ -5,7 +5,7 @@ from loguru import logger
 def run_daily_sync():
     service = SyncService()
     try:
-        logger.info("Starting sales sync")
+        # Only sync sales
         service.sync_recent_sales(days=1)
         logger.info("Sales sync completed")
     except Exception as e:
