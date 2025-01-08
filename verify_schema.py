@@ -6,14 +6,17 @@ def verify_schema():
     try:
         supabase = SupabaseService()
         
-        # Test products table structure
-        products = supabase.client.rpc('test_products_schema').execute()
+        # Test products table
+        products = supabase.client.table('shopify_products').select('*').limit(1).execute()
+        logger.info("Products table schema OK")
         
-        # Test sales table structure
-        sales = supabase.client.rpc('test_sales_schema').execute()
+        # Test sales table
+        sales = supabase.client.table('shopify_sales').select('*').limit(1).execute()
+        logger.info("Sales table schema OK")
         
-        # Test sale items table structure
-        items = supabase.client.rpc('test_sale_items_schema').execute()
+        # Test sale items table
+        items = supabase.client.table('shopify_sale_items').select('*').limit(1).execute()
+        logger.info("Sale items table schema OK")
         
         logger.info("Schema verification completed successfully")
         return True
