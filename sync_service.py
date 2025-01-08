@@ -68,11 +68,12 @@ class SyncService:
                 if self.session.query(Sale).filter_by(shopify_order_id=order_data['id']).first():
                     continue
                     
+                total_price = '0.00' if not order_data['total_price'] else order_data['total_price'].replace('None', '0.00')
                 sale = Sale(
                     shopify_order_id=order_data['id'],
                     order_name=order_data['order_name'],
                     created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                    total_price=Decimal(str(order_data['total_price']))
+                    total_price=Decimal(str(total_price))
                 )
                 self.session.add(sale)
                 self.session.flush()  # Get sale.id
