@@ -122,3 +122,26 @@ class SyncService:
             self.session.rollback()
             self._update_sync_log(sync_log, "failed", str(e))
             raise
+def update_existing_sales_channels(self):
+        """Update sales channels for existing orders"""
+        sync_log = self._create_sync_log()
+        try:
+            logger.info("Updating sales channels for existing orders")
+            for order_data in self.client.iter_recent_orders(days=365):  # Get a year's worth of orders
+                sale = self.session.query(ShopifySale).filter_by(
+                    shopify_order_id=order_data['id']
+                ).first()
+                
+                if sale and not sale.sales_channel:
+                    sale.sales_channel = order_data.get('sales_channel')
+                    logger.info(f"Updated sales channel for order {order_data['order_name']}")
+                    sync_log.records_processed = (sync_log.records_processed or 0) + 1
+            
+            self.session.commit()
+            self._update_sync_log(sync_log, "completed")
+            
+        except Exception as e:
+            logger.error(f"Error updating sales channels: {str(e)}")
+            self.session.rollback()
+            self._update_sync_log(sync_log, "failed", str(e))
+            raise
