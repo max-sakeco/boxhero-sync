@@ -1,0 +1,16 @@
+~/boxhero-sync$ python test_orders.py
+2025-01-08 04:48:08.593 | INFO     | __main__:test_orders:7 - Fetching orders from Shopify...
+2025-01-08 04:48:08.593 | INFO     | shopify_client:iter_recent_orders:94 - Fetching orders from Shopify API
+2025-01-08 04:48:08.998 | ERROR    | shopify_client:iter_recent_orders:131 - Shopify API error: [{'message': "Field must have selections (field 'channel' returns Channel but has no selections. Did you mean 'channel { ... }'?)", 'locations': [{'line': 15, 'column': 25}], 'path': ['query', 'orders', 'edges', 'node', 'channel'], 'extensions': {'code': 'selectionMismatch', 'nodeName': "field 'channel'", 'typeName': 'Channel'}}]
+2025-01-08 04:48:08.999 | ERROR    | __main__:test_orders:28 - Error testing orders: Shopify API error: [{'message': "Field must have selections (field 'channel' returns Channel but has no selections. Did you mean 'channel { ... }'?)", 'locations': [{'line': 15, 'column': 25}], 'path': ['query', 'orders', 'edges', 'node', 'channel'], 'extensions': {'code': 'selectionMismatch', 'nodeName': "field 'channel'", 'typeName': 'Channel'}}]
+2025-01-08 04:48:08.999 | ERROR    | __main__:test_orders:29 - Error type: <class 'ValueError'>
+Traceback (most recent call last):
+  File "/home/runner/boxhero-sync/test_orders.py", line 33, in <module>
+    test_orders()
+  File "/home/runner/boxhero-sync/test_orders.py", line 9, in test_orders
+    for order in client.iter_recent_orders(days=30):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/boxhero-sync/shopify_client.py", line 132, in iter_recent_orders
+    raise ValueError(f"Shopify API error: {result['errors']}")
+ValueError: Shopify API error: [{'message': "Field must have selections (field 'channel' returns Channel but has no selections. Did you mean 'channel { ... }'?)", 'locations': [{'line': 15, 'column': 25}], 'path': ['query', 'orders', 'edges', 'node', 'channel'], 'extensions': {'code': 'selectionMismatch', 'nodeName': "field 'channel'", 'typeName': 'Channel'}}]
+~/boxhero-sync$ 
