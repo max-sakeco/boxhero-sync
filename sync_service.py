@@ -86,7 +86,7 @@ class SyncService:
                         total_price=safe_decimal(order_data['total_price'])
                     )
                     self.session.add(sale)
-                    self.session.commit()
+                    self.session.flush()
                     self.session.refresh(sale)
                     
                     # Process items one by one
@@ -101,7 +101,6 @@ class SyncService:
                             sku=item['sku']
                         )
                         self.session.add(sale_item)
-                        self.session.flush()
                     
                     sync_log.records_processed = (sync_log.records_processed or 0) + 1
                     self.session.commit()
