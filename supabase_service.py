@@ -13,7 +13,7 @@ class SupabaseService:
 
     def sync_item(self, item_data: dict):
         try:
-            self.client.table('items').upsert({
+            self.client.table('boxhero').upsert({
                 'boxhero_id': item_data['boxhero_id'],
                 'name': item_data['name'],
                 'sku': item_data['sku'],
