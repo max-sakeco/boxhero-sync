@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from decimal import Decimal
 from utils import safe_decimal
-from models import Product, SaleItem, SyncLog, get_session
+from models import Product, ShopifySale, ShopifySaleItem, SyncLog, get_session
 from shopify_client import ShopifyClient
 
 class SyncService:
@@ -73,8 +73,24 @@ class SyncService:
                 # Process items one by one
                 for item in order_data['items']:
                     # Skip if this specific item from this order already exists
-                    existing_item = self.session.query(SaleItem).filter_by(
-                        shopify_order_id=order_data['id'],
+                    # Check if sale exists
+                    sale = self.session.query(ShopifySale).filter_by(
+                        shopify_order_id=order_data['id']
+                    ).first()
+                    
+                    if not sale:
+                        sale = ShopifySale(
+                            shopify_order_id=order_data['id'],
+                            order_name=order_data['order_name'],
+                            created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
+                            total_price=safe_decimal(order_data['total_price'])
+                        )
+                        self.session.add(sale)
+                        self.session.flush()
+                    
+                    # Check if item exists
+                    existing_item = self.session.query(ShopifySaleItem).filter_by(
+                        sale_id=sale.id,
                         title=item['title']
                     ).first()
                     
@@ -83,11 +99,8 @@ class SyncService:
                         continue
                         
                     logger.info(f"Processing item: {item['title']} for order {order_data['order_name']}")
-                    sale_item = SaleItem(
-                        shopify_order_id=order_data['id'],
-                        order_name=order_data['order_name'],
-                        created_at=datetime.fromisoformat(order_data['created_at'].replace('Z', '+00:00')),
-                        total_price=safe_decimal(order_data['total_price']),
+                    sale_item = ShopifySaleItem(
+                        sale_id=sale.id,
                         title=item['title'],
                         quantity=item['quantity'],
                         original_price=safe_decimal(item['original_price']),

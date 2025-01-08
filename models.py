@@ -24,14 +24,21 @@ class Product(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class SaleItem(Base):
-    __tablename__ = 'shopify_sales_items'
+class ShopifySale(Base):
+    __tablename__ = 'shopify_sales'
 
     id = Column(Integer, primary_key=True)
     shopify_order_id = Column(String, nullable=False)
     order_name = Column(String)
     created_at = Column(DateTime)
     total_price = Column(Numeric(10, 2))
+    synced_at = Column(DateTime, default=datetime.utcnow)
+
+class ShopifySaleItem(Base):
+    __tablename__ = 'shopify_sale_items'
+
+    id = Column(Integer, primary_key=True)
+    sale_id = Column(Integer, ForeignKey('shopify_sales.id'), nullable=False)
     title = Column(String, nullable=False)
     quantity = Column(Integer)
     original_price = Column(Numeric(10, 2))

@@ -15,12 +15,18 @@ CREATE TABLE IF NOT EXISTS shopify_products (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS shopify_sales_items (
+CREATE TABLE IF NOT EXISTS shopify_sales (
     id SERIAL PRIMARY KEY,
     shopify_order_id VARCHAR NOT NULL,
     order_name VARCHAR,
     created_at TIMESTAMPTZ,
     total_price DECIMAL(10,2),
+    synced_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS shopify_sale_items (
+    id SERIAL PRIMARY KEY,
+    sale_id INTEGER REFERENCES shopify_sales(id),
     title VARCHAR NOT NULL,
     quantity INTEGER,
     original_price DECIMAL(10,2),
