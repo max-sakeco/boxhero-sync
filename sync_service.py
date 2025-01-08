@@ -107,5 +107,3 @@ class SyncService:
             self.session.rollback()
             self._update_sync_log(sync_log, "failed", str(e))
             raise
-        finally:
-            self.session.close()
