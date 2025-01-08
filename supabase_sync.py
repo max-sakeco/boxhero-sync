@@ -2,6 +2,7 @@
 from supabase_service import SupabaseService
 from models import get_session, Product, ShopifySale, ShopifySaleItem, SyncLog
 from loguru import logger
+from datetime import datetime
 
 class SupabaseSync:
     def __init__(self):
@@ -21,40 +22,38 @@ class SupabaseSync:
                 'price': float(product.price) if product.price else None,
                 'compare_at_price': float(product.compare_at_price) if product.compare_at_price else None,
                 'image_url': product.image_url,
-                'last_synced_at': product.last_synced_at.isoformat(),
-                'created_at': product.created_at.isoformat(),
-                'updated_at': product.updated_at.isoformat()
-            }, on_conflict='shopify_id').execute()
+                'last_synced_at': product.last_synced_at.isoformat() if product.last_synced_at else None,
+                'created_at': product.created_at.isoformat() if product.created_at else None,
+                'updated_at': product.updated_at.isoformat() if product.updated_at else None
+            }).execute()
         logger.info(f"Synced {len(products)} products to Supabase")
 
     def sync_sales(self):
         sales = self.session.query(ShopifySale).all()
         for sale in sales:
             # Insert sale
-            sale_data = {
+            sale_result = self.supabase.client.table('shopify_sales').upsert({
                 'shopify_order_id': sale.shopify_order_id,
                 'order_name': sale.order_name,
-                'created_at': sale.created_at.isoformat(),
+                'created_at': sale.created_at.isoformat() if sale.created_at else None,
                 'total_price': float(sale.total_price) if sale.total_price else None,
-                'synced_at': sale.synced_at.isoformat()
-            }
-            result = self.supabase.client.table('shopify_sales').upsert(
-                sale_data, 
-                on_conflict='shopify_order_id'
-            ).execute()
+                'sales_channel': sale.sales_channel,
+                'synced_at': datetime.utcnow().isoformat()
+            }).execute()
+
+            # Get the Supabase sale ID from the response
+            supabase_sale = sale_result.data[0]
             
-            # Get Supabase sale id
-            supabase_sale_id = result.data[0]['id']
-            
-            # Insert sale items
+            # Sync sale items
             for item in sale.items:
-                self.supabase.client.table('sale_items').upsert({
-                    'sale_id': supabase_sale_id,
+                self.supabase.client.table('shopify_sale_items').upsert({
+                    'sale_id': supabase_sale['id'],
                     'title': item.title,
                     'quantity': item.quantity,
                     'original_price': float(item.original_price) if item.original_price else None,
                     'discounted_price': float(item.discounted_price) if item.discounted_price else None,
-                    'sku': item.sku
+                    'sku': item.sku,
+                    'synced_at': datetime.utcnow().isoformat()
                 }).execute()
         
         logger.info(f"Synced {len(sales)} sales to Supabase")
@@ -64,7 +63,7 @@ class SupabaseSync:
             logger.info("Starting Supabase sync")
             self.sync_products()
             self.sync_sales()
-            logger.info("Supabase sync completed")
+            logger.info("Supabase sync completed successfully")
         except Exception as e:
             logger.error(f"Supabase sync failed: {str(e)}")
             raise
