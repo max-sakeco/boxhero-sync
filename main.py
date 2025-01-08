@@ -17,7 +17,8 @@ def sync_job():
     logger.info("Starting sync job")
     try:
         service = SyncService()
-        service.sync()
+        service.sync_products()
+        service.sync_recent_sales(days=1)
     except Exception as e:
         logger.error(f"Sync job failed: {str(e)}")
     logger.info("Sync job completed")
