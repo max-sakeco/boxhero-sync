@@ -1,57 +1,148 @@
 
-import shopify
-from loguru import logger
 import os
 from typing import Generator, Dict
+import requests
+from loguru import logger
 
 class ShopifyClient:
     def __init__(self):
-        shop_url = os.getenv('SHOPIFY_SHOP_URL')
-        access_token = os.getenv('SHOPIFY_API_KEY')
+        self.shop_url = os.getenv('SHOPIFY_SHOP_URL')
+        self.access_token = os.getenv('SHOPIFY_API_KEY')
         
-        if not shop_url or not access_token:
+        if not self.shop_url or not self.access_token:
             raise ValueError("Shopify credentials not found in environment")
             
-        api_version = '2024-01'
-        shop_url = f"https://{shop_url}/admin/api/{api_version}"
-        
-        session = shopify.Session(shop_url, api_version, access_token)
-        shopify.ShopifyResource.activate_session(session)
-        
+        self.api_url = f"https://{self.shop_url}/admin/api/2024-01/graphql.json"
+        self.headers = {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': self.access_token
+        }
+
+    def _execute_query(self, query: str, variables: dict = None) -> dict:
+        response = requests.post(
+            self.api_url,
+            json={'query': query, 'variables': variables or {}},
+            headers=self.headers
+        )
+        response.raise_for_status()
+        return response.json()
+
     def iter_all_products(self) -> Generator[Dict, None, None]:
-        """Iterator to fetch all products"""
-        page = 1
+        query = """
+        query($cursor: String) {
+            products(first: 50, after: $cursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                edges {
+                    node {
+                        id
+                        title
+                        description
+                        images(first: 1) {
+                            edges {
+                                node {
+                                    url
+                                }
+                            }
+                        }
+                        variants(first: 1) {
+                            edges {
+                                node {
+                                    sku
+                                    barcode
+                                    inventoryQuantity
+                                    price
+                                    compareAtPrice
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """
+        
+        cursor = None
         while True:
-            products = shopify.Product.find(limit=250, page=page)
-            if not products:
-                break
+            result = self._execute_query(query, {'cursor': cursor})
+            products = result['data']['products']
+            
+            for edge in products['edges']:
+                product = edge['node']
+                variant = product['variants']['edges'][0]['node'] if product['variants']['edges'] else {}
+                image_url = product['images']['edges'][0]['node']['url'] if product['images']['edges'] else None
                 
-            for product in products:
                 yield {
-                    'id': str(product.id),
-                    'name': product.title,
-                    'sku': getattr(product.variants[0], 'sku', None),
-                    'barcode': getattr(product.variants[0], 'barcode', None),
-                    'quantity': int(getattr(product.variants[0], 'inventory_quantity', 0)),
-                    'price': str(getattr(product.variants[0], 'price', 0)),
-                    'cost': str(getattr(product.variants[0], 'cost', 0)),
-                    'photo_url': product.images[0].src if product.images else None,
+                    'id': product['id'].split('/')[-1],
+                    'name': product['title'],
+                    'description': product['description'],
+                    'sku': variant.get('sku'),
+                    'barcode': variant.get('barcode'),
+                    'quantity': variant.get('inventoryQuantity', 0),
+                    'price': str(variant.get('price', 0)),
+                    'cost': str(variant.get('compareAtPrice', 0)),
+                    'photo_url': image_url,
                     'attrs': []
                 }
             
-            page += 1
-            
-    def get_product(self, product_id: str) -> Dict:
-        """Fetch a specific product"""
-        product = shopify.Product.find(product_id)
-        return {
-            'id': str(product.id),
-            'name': product.title,
-            'sku': getattr(product.variants[0], 'sku', None),
-            'barcode': getattr(product.variants[0], 'barcode', None),
-            'quantity': int(getattr(product.variants[0], 'inventory_quantity', 0)),
-            'price': str(getattr(product.variants[0], 'price', 0)),
-            'cost': str(getattr(product.variants[0], 'cost', 0)),
-            'photo_url': product.images[0].src if product.images else None,
-            'attrs': []
+            if not products['pageInfo']['hasNextPage']:
+                break
+            cursor = products['pageInfo']['endCursor']
+
+    def iter_recent_orders(self, days: int = 30) -> Generator[Dict, None, None]:
+        query = """
+        query($cursor: String) {
+            orders(first: 50, after: $cursor) {
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+                edges {
+                    node {
+                        id
+                        name
+                        createdAt
+                        totalPrice
+                        lineItems(first: 50) {
+                            edges {
+                                node {
+                                    title
+                                    quantity
+                                    originalUnitPrice
+                                    discountedUnitPrice
+                                    sku
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+        """
+        
+        cursor = None
+        while True:
+            result = self._execute_query(query, {'cursor': cursor})
+            orders = result['data']['orders']
+            
+            for edge in orders['edges']:
+                order = edge['node']
+                yield {
+                    'id': order['id'].split('/')[-1],
+                    'order_name': order['name'],
+                    'created_at': order['createdAt'],
+                    'total_price': order['totalPrice'],
+                    'items': [{
+                        'title': item['node']['title'],
+                        'quantity': item['node']['quantity'],
+                        'original_price': item['node']['originalUnitPrice'],
+                        'discounted_price': item['node']['discountedUnitPrice'],
+                        'sku': item['node']['sku']
+                    } for item in order['lineItems']['edges']]
+                }
+            
+            if not orders['pageInfo']['hasNextPage']:
+                break
+            cursor = orders['pageInfo']['endCursor']
