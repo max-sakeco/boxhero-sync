@@ -1,0 +1,16 @@
+~/boxhero-sync$ python test_orders.py
+2025-01-08 04:53:00.199 | INFO     | __main__:test_orders:8 - Testing Shopify Orders API...
+2025-01-08 04:53:00.199 | INFO     | __main__:test_orders:9 - Fetching orders from Shopify...
+2025-01-08 04:53:00.200 | INFO     | shopify_client:iter_recent_orders:94 - Fetching orders from Shopify API
+2025-01-08 04:53:00.675 | ERROR    | shopify_client:iter_recent_orders:135 - Shopify API error: [{'message': "Field 'type' doesn't exist on type 'ChannelDefinition'", 'locations': [{'line': 17, 'column': 33}], 'path': ['query', 'orders', 'edges', 'node', 'channelInformation', 'channelDefinition', 'type'], 'extensions': {'code': 'undefinedField', 'typeName': 'ChannelDefinition', 'fieldName': 'type'}}]
+2025-01-08 04:53:00.675 | ERROR    | __main__:test_orders:31 - Error testing orders: Shopify API error: [{'message': "Field 'type' doesn't exist on type 'ChannelDefinition'", 'locations': [{'line': 17, 'column': 33}], 'path': ['query', 'orders', 'edges', 'node', 'channelInformation', 'channelDefinition', 'type'], 'extensions': {'code': 'undefinedField', 'typeName': 'ChannelDefinition', 'fieldName': 'type'}}]
+2025-01-08 04:53:00.675 | ERROR    | __main__:test_orders:32 - Error type: <class 'ValueError'>
+Traceback (most recent call last):
+  File "/home/runner/boxhero-sync/test_orders.py", line 36, in <module>
+    test_orders()
+  File "/home/runner/boxhero-sync/test_orders.py", line 11, in test_orders
+    for order in client.iter_recent_orders(days=30):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/boxhero-sync/shopify_client.py", line 136, in iter_recent_orders
+    raise ValueError(f"Shopify API error: {result['errors']}")
+ValueError: Shopify API error: [{'message': "Field 'type' doesn't exist on type 'ChannelDefinition'", 'locations': [{'line': 17, 'column': 33}], 'path': ['query', 'orders', 'edges', 'node', 'channelInformation', 'channelDefinition', 'type'], 'extensions': {'code': 'undefinedField', 'typeName': 'ChannelDefinition', 'fieldName': 'type'}}]
