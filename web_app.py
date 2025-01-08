@@ -145,6 +145,31 @@ def trigger_sync():
 
 @app.route('/')
 def index():
+    return render_template_string("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Shopify Dashboard</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container mt-4">
+                <h1>Shopify Dashboard</h1>
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <a href="/products" class="btn btn-primary btn-lg w-100">Products</a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/sales" class="btn btn-success btn-lg w-100">Sales</a>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    """)
+
+@app.route('/products')
+def products():
     logger.info("Starting index page request")
     session = get_session()
     items_query = session.query(Item).all()
@@ -199,3 +224,60 @@ if __name__ == '__main__':
     # Get port from environment variable for Replit
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+@app.route('/sales')
+def sales():
+    session = get_session()
+    sales = session.query(Sale).order_by(Sale.created_at.desc()).all()
+    
+    return render_template_string("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Sales Data</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+        </head>
+        <body>
+            <div class="container-fluid mt-4">
+                <h1>Sales Data</h1>
+                <a href="/" class="btn btn-secondary mb-3">Back to Dashboard</a>
+                <div class="table-responsive">
+                    <table id="sales-table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Date</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                            <tr>
+                                <td>{{ sale.order_name }}</td>
+                                <td>{{ sale.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% for item in sale.items %}
+                                    <div>{{ item.quantity }}x {{ item.title }} ({{ item.discounted_price }})</div>
+                                    {% endfor %}
+                                </td>
+                                <td>${{ "%.2f"|format(sale.total_price) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function() {
+                    $('#sales-table').DataTable({
+                        order: [[1, 'desc']],
+                        pageLength: 25
+                    });
+                });
+            </script>
+        </body>
+        </html>
+    """, sales=sales)
